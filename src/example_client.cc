@@ -7,5 +7,5 @@ ExampleClient::ExampleClient() {
 ExampleClient::~ExampleClient(){};
 
 std::pair<CURLcode, std::string> ExampleClient::GETRequest() {
-  return m_curl_client.sendGETRequest();
+  return m_curl_client -> sendGETRequest();
 };
