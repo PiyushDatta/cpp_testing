@@ -12,5 +12,5 @@ set(HEADERS
     include/example_client.h
 )
 
-add_executable(example_client_src main.cc ${SOURCES} ${HEADERS})
-target_link_libraries(example_client_src simple_curl_cpp_src)
+add_executable(example_client main.cc ${SOURCES} ${HEADERS})
+target_link_libraries(example_client simple_curl_cpp)
