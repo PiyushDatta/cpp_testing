@@ -5,11 +5,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(SOURCES
-    example_client.cc
+    example_client/example_client.cc
 )
 
 set(HEADERS
-    include/example_client.h
+    example_client/include/example_client.h
 )
 
 add_executable(example_client main.cc ${SOURCES} ${HEADERS})
