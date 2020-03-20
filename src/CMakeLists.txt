@@ -13,4 +13,4 @@ set(HEADERS
 )
 
 add_executable(example_client main.cc ${SOURCES} ${HEADERS})
-target_link_libraries(example_client simple_curl_cpp)
+target_link_libraries(example_client simple_curl_cpp nlohmann_json::nlohmann_json)

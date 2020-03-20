@@ -1,4 +1,3 @@
-// #include <json/json.h>
 #include <curl_client.h>
 
 class ExampleClient {
