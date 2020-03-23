@@ -1,5 +1,6 @@
 #include "example_client/testing_curl/include/example_client.h"
 #include <nlohmann/json.hpp>
+#include "utils/include/util_functions.h"
 
 int main(int argc, char const *argv[]) {
   ExampleClient example_client;
@@ -18,6 +19,12 @@ int main(int argc, char const *argv[]) {
     std::cout << "ERROR: " << e.what() << '\n';
     std::cout << "Exception id: " << e.id << '\n';
   }
+
+  UtilFunc::debug_log("hello world!", true);
+  UtilFunc::debug_log("hello world! num: ", 2, true);
+
+  int this_num = 5;
+  std::cout << UtilFunc::custom_to_string(this_num) << std::endl;
 
   return 0;
 }

@@ -6,10 +6,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(SOURCES
     example_client/testing_curl/example_client.cc
+    utils/util_functions.cc
 )
 
 set(HEADERS
     example_client/testing_curl/include/example_client.h
+    utils/include/util_functions.h
 )
 
 add_library(example_client_lib ${SOURCES} ${HEADERS})
