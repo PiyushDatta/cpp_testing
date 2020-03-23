@@ -1,4 +1,4 @@
-#include "../src/example_client/include/example_client.h"
+#include "../src/example_client/testing_curl/include/example_client.h"
 #include <gtest/gtest.h>
 #include <string>
 
