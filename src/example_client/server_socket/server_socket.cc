@@ -31,6 +31,15 @@ void ServerSocket::setupSocket(const int &socket_port, const bool &debug) {
   // creating socket file descriptor
   m_master_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
 
+  // make socket non blocking
+#ifdef _WIN32
+  // 1 to enable non-blocking socket
+  u_long block_sock_flag = 1;
+  ioctlsocket(m_master_sock_fd, FIONBIO, &block_sock_flag);
+#else
+  fcntl(m_master_sock_fd, F_SETFL, O_NONBLOCK);
+#endif
+
   // open socket
   if (m_master_sock_fd < 0) {
     util_func::err_log("Could not open socket", true);
