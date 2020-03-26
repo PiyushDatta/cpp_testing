@@ -91,7 +91,6 @@ int ServerSocket::listenPort() { return listen(m_master_sock_fd, SOMAXCONN); }
 void ServerSocket::closeOpenSocket(int open_socket) {
   util_func::debug_log("Closing socket ", open_socket, m_debug);
 #ifdef _WIN32
-  WSACleanup();
   closesocket(open_socket);
 #else
   close(open_socket);
