@@ -11,6 +11,9 @@ ServerSocket::~ServerSocket() {
   util_func::debug_log("Destroying server socket", m_debug);
   closeOpenSocket(m_master_sock_fd);
   closeOpenSocket(m_temp_sock_fd);
+#ifndef _WIN32
+  WSACleanup();
+#endif
 }
 
 void ServerSocket::setupSocket(const int &socket_port, const bool &debug) {
