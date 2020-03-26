@@ -23,7 +23,7 @@ void ServerSocket::setupSocket(const int &socket_port, const bool &debug) {
   int ws_sock = WSAStartup(win_ver, &win_data);
   if (ws_sock != 0) {
     util_func::err_log("Could not start WinSock, err#: ", WSAGetLastError(),
-                      true);
+                       true);
     exit(1);
   }
 #endif
@@ -104,22 +104,27 @@ void ServerSocket::handleNewConnection() {
     // increment the maximum known file descriptor (select() needs it)
     if (m_temp_sock_fd > m_max_fd) {
       util_func::debug_log("Max fd changed from " +
-                              util_func::custom_to_string(m_max_fd) + " to ",
-                          m_temp_sock_fd, m_debug);
+                               util_func::custom_to_string(m_max_fd) + " to ",
+                           m_temp_sock_fd, m_debug);
       m_max_fd = m_temp_sock_fd;
     }
 
-    // inform user of socket number - used in send and receive commands
+    // get ip address of client
+    char serv_ip_addr[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(m_server_addr.sin_addr), serv_ip_addr,
+              INET_ADDRSTRLEN);
+
+    // get info - used in send and receive commands
     std::string new_conn_print =
         "\nNew connection, socket fd is " +
         util_func::custom_to_string(m_temp_sock_fd) + ", ip is " +
-        inet_ntoa(m_server_addr.sin_addr) + ", port is " +
+        serv_ip_addr + ", port is " +
         util_func::custom_to_string(ntohs(m_server_addr.sin_port));
     util_func::debug_log(new_conn_print, true);
 
     // send connection successful message to client
-    std::string conn_success_msg =
-        "Successful connection to port " + util_func::custom_to_string(m_portno);
+    std::string conn_success_msg = "Successful connection to port " +
+                                   util_func::custom_to_string(m_portno);
     int send_err = send(m_temp_sock_fd, conn_success_msg.c_str(),
                         conn_success_msg.size() + 1, 0);
     if (send_err == -1) {
@@ -140,8 +145,8 @@ void ServerSocket::recvFromExistingClient(int sock_fd) {
     util_func::debug_log("Data from socket: ", sock_fd, m_debug);
     util_func::debug_log("Received bytes: ", byte_recv, m_debug);
     util_func::debug_log("If received bytes is 0, then client disconnected, "
-                        "otherwise its an error in recv().",
-                        m_debug);
+                         "otherwise its an error in recv().",
+                         m_debug);
 
     // drop client
     closeOpenSocket(sock_fd);
@@ -151,7 +156,7 @@ void ServerSocket::recvFromExistingClient(int sock_fd) {
     util_func::debug_log("Data from socket: ", sock_fd, m_debug);
     util_func::debug_log("Received bytes: ", byte_recv, m_debug);
     util_func::debug_log("Received message: " + std::string(input_buffer),
-                        m_debug);
+                         m_debug);
     send(sock_fd, input_buffer, byte_recv + 1, 0);
   }
 }
