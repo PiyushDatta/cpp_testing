@@ -1,5 +1,17 @@
 import socket
 import errno
+import binascii
+
+
+def recv_all(sock, buff_size):
+  data = b''
+  while True:
+    packet = sock.recv(buff_size)
+    data += packet
+    if len(packet) < buff_size:
+      break
+  return data
+
 
 if __name__ == "__main__":
   # The server's hostname or IP address
@@ -17,16 +29,23 @@ if __name__ == "__main__":
     print("Socket connecting to host {0} and port {1}".format(HOST, PORT))
 
     # Get the first greeting message if any
-    recv_msg = sock.recv(INPUT_BUFFER_SIZE)
-    print("Received: {0}".format(recv_msg.decode('utf-8')))
+    recv_msg = recv_all(sock, INPUT_BUFFER_SIZE)
+    print("Received: {0}".format(recv_msg))
+    # print("Received: {0}".format(recv_msg.decode('utf-8')))
 
     # Keep client connection open as long as user wants to write messages
     while True:
       send_msg = input()
       print("Sending")
       sock.sendall(send_msg.encode('utf-8'))
-      recv_msg = sock.recv(INPUT_BUFFER_SIZE)
-      print("Received: {0}".format(recv_msg.decode('utf-8')))
+      recv_msg = recv_all(sock, INPUT_BUFFER_SIZE)
+      try:
+        print("Received: {0}".format(recv_msg))
+        # print("Received: {0}".format(recv_msg.decode('utf-8', errors="ignore")))
+      except UnicodeDecodeError as e:
+        print(
+            "Error: receving msg had a unicode decode error - {0}".format(repr(e)))
+        continue
   except KeyboardInterrupt as e:
     print("Disconnecting")
   except ConnectionRefusedError as e:

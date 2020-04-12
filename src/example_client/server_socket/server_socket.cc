@@ -146,29 +146,52 @@ void ServerSocket::handleNewConnection() {
   }
 }
 
-void ServerSocket::recvFromExistingClient(int sock_fd) {
-  memset(input_buffer, 0, sizeof(input_buffer));
+long long ServerSocket::recvAll(const int &sock_fd, char *input_buffer,
+                                std::string &client_msg) {
+  long long all_bytes_recv = 0;
+  int bytes_read = 0;
+  bytes_read = recv(sock_fd, input_buffer, INPUT_BUFFER_SIZE, 0);
+  if (bytes_read <= 0) {
+    util_func::err_log(
+        "0 bytes read, while receiving part of message from socket: ", sock_fd,
+        m_debug);
+    return 0;
+  }
 
-  // wait for client to send data
-  int byte_recv = recv(sock_fd, input_buffer, INPUT_BUFFER_SIZE, 0);
+  while (bytes_read > 0) {
+    all_bytes_recv += bytes_read;
+    client_msg.append(input_buffer, bytes_read);
+    bytes_read = recv(sock_fd, input_buffer, INPUT_BUFFER_SIZE, 0);
+  }
+
+  return all_bytes_recv;
+}
+
+void ServerSocket::recvFromExistingClient(int sock_fd) {
+  // wait for client to send all data
+  std::string client_msg = "";
+  long long byte_recv = recvAll(sock_fd, input_buffer, client_msg);
 
   if (byte_recv <= 0) {
-    util_func::debug_log("Data from socket: ", sock_fd, m_debug);
-    util_func::debug_log("Received bytes: ", byte_recv, m_debug);
+    util_func::debug_log("Data from socket fd #: ", sock_fd, m_debug);
+    util_func::debug_log("Received bytes: ", (long long)byte_recv, m_debug);
     util_func::debug_log("If received bytes is 0, then client disconnected, "
                          "otherwise its an error in recv().",
                          m_debug);
-
     // drop client
     closeOpenSocket(sock_fd);
     FD_CLR(sock_fd, &m_master_fds);
   } else {
     // echo message back to client
-    util_func::debug_log("Data from socket: ", sock_fd, m_debug);
-    util_func::debug_log("Received bytes: ", byte_recv, m_debug);
-    util_func::debug_log("Received message: " + std::string(input_buffer),
-                         m_debug);
-    send(sock_fd, input_buffer, byte_recv + 1, 0);
+    util_func::debug_log("Data from socket fd #: ", sock_fd, m_debug);
+    util_func::debug_log("Received bytes: ", (long long)byte_recv, m_debug);
+    util_func::debug_log("Received message: " + client_msg + "\n", m_debug);
+    int send_err = send(sock_fd, client_msg.c_str(), sizeof(client_msg), 0);
+    if (send_err == -1) {
+      util_func::err_log(
+          "Could not send successful connection message to client socket ",
+          m_temp_sock_fd, true);
+    }
   }
 }
 

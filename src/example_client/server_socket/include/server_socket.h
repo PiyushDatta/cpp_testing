@@ -21,7 +21,7 @@
 #ifndef ALGO_SERVER_SOCK
 #define ALGO_SERVER_SOCK
 
-const int INPUT_BUFFER_SIZE = 4096;
+const int INPUT_BUFFER_SIZE = 5;
 const int DEFAULT_PORT = 13000;
 const bool DEFAULT_DEBUG = true;
 
@@ -39,10 +39,20 @@ private:
   void handleNewConnection();
   void recvFromExistingClient(int sock_fd);
   void closeOpenSocket(int open_socket);
+  // receive the entire message from client, in chunks of INPUT_BUFFER_SIZE
+  long long recvAll(const int &sock_fd, char *input_buffer,
+                    std::string &client_msg);
+
+  // input buffer
+  char input_buffer[INPUT_BUFFER_SIZE];
+
+  // port
+  int m_portno;
+  // debug
+  bool m_debug;
 
   // master socket which receives new connections
   int m_master_sock_fd;
-
   // temporary socket file descriptor which holds new clients
   int m_temp_sock_fd;
 
@@ -57,13 +67,5 @@ private:
   struct sockaddr_storage m_client_addr;
   // server socket details
   struct sockaddr_in m_server_addr;
-
-  // input buffer
-  char input_buffer[INPUT_BUFFER_SIZE];
-
-  // port
-  int m_portno;
-  // debug
-  bool m_debug;
 };
 #endif
